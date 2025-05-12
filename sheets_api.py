@@ -14,7 +14,7 @@ credentials = Credentials.from_service_account_info(
 client = gspread.authorize(credentials)
 
 # Open the Google Sheet
-SHEET_URL = st.secrets["private_gsheets_url"]
+SHEET_URL = st.secrets["gcp_service_accunt"]["private_gsheets_url"]
 sheet = client.open_by_url(SHEET_URL).sheet1
 
 def get_dropdown_options():
