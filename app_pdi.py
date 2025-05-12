@@ -38,11 +38,15 @@ players, goals, sessions = get_dropdown_options()
 
 player = st.selectbox("Nome do Atleta", options=players + ["Adicionar novo..."])
 if player == "Adicionar novo...":
-    col1, col2 = st.columns([1, 2])  # adjust ratios as needed
+    col1, col2 = st.columns([1, 2])  # Adjust ratio for better spacing
 
     with col1:
         st.markdown(
-            "<div style='text-align: right; color: red; padding-top: 6px;'>Insira o novo Atleta</div>",
+            """
+            <div style='display: flex; align-items: center; justify-content: flex-end; height: 38px;'>
+                <span style='color: red;'>Insira o novo Atleta</span>
+            </div>
+            """,
             unsafe_allow_html=True
         )
 
