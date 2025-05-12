@@ -80,7 +80,7 @@ col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
 with col1:
     session_date = st.date_input("Data", value=date.today())
 
-with col2:
+with col4:
     st.markdown("<div style='height: 32px;'></div>", unsafe_allow_html=True)  # vertical spacer
     submit = st.button("Registrar Treino")
 
