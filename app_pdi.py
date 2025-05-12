@@ -32,9 +32,14 @@ st.header("🗓️ Registro de Atividades Individuais")
 players, goals, sessions = get_dropdown_options()
 
 # Player Name
+#player = st.selectbox("Nome do Atleta", options=players + ["Adicionar novo..."])
+#if player == "Adicionar novo...":
+#    player = st.text_input("Insira o novo Atleta")
+
 player = st.selectbox("Nome do Atleta", options=players + ["Adicionar novo..."])
 if player == "Adicionar novo...":
-    player = st.text_input("Insira o novo Atleta")
+    st.markdown('<span style="color: red">Insira o novo Atleta</span>', unsafe_allow_html=True)
+    player = st.text_input("")
 
 # Training Goal
 goal = st.selectbox("Objetivo do Treino", options=goals + ["Adicionar novo..."])
