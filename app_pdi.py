@@ -63,7 +63,7 @@ if auth_status:
         </style>
         """, unsafe_allow_html=True)
 
-    st.header("🗓️  Registro de Atividades Individuais")
+    st.header("🗓️ Registro de Atividades Individuais")
 
     # Load dropdown options
     players, goals, sessions = get_dropdown_options()
