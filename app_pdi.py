@@ -5,9 +5,11 @@ from datetime import date
 # Apply custom CSS for Helvetica Neue font
 st.markdown("""
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Helvetica+Neue&display=swap');
-    html, body, [class*="css"]  {
+    @import url('https://fonts.googleapis.com/css2?family=Helvetica+Neue:300&display=swap');
+    html, body, [class*="css"] {
         font-family: 'Helvetica Neue', sans-serif;
+        font-weight: 300;
+        font-size: 14px;
     }
     </style>
     """, unsafe_allow_html=True)
