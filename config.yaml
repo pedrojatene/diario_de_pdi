@@ -33,5 +33,5 @@ credentials:
 
 cookie:
   expiry_days: 30
-  key: "supersecretkey"
-  name: "pdi_auth"
+  key: some_signature_key
+  name: some_cookie_name
