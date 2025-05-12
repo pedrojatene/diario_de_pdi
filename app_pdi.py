@@ -73,8 +73,9 @@ if session_type == "Adicionar novo...":
     with col2:
         session_type = st.text_input("", key="new_session_type")
 
+# Data e submissão
 
-col1, col2 = st.columns([1, 1])  # Wider for date input, narrower for button
+col1, col2, col3, col4 = st.columns([1, 1, 1, 1]) 
 
 with col1:
     session_date = st.date_input("Data", value=date.today())
