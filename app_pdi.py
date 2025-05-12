@@ -5,6 +5,11 @@ import streamlit as st
 from sheets_api import get_dropdown_options, append_row_to_sheet
 from datetime import date
 
+st.set_page_config(
+    page_title="Diário de PDI",
+    page_icon="📕",  # You can use any emoji or a custom image URL
+    layout="wide"    # Optional: makes the layout use full width
+)
 
 with open('config.yaml') as file:
     config = yaml.load(file, Loader=SafeLoader)
