@@ -24,7 +24,7 @@ if player == "Adicionar novo...":
 
 # Training Goal
 goal = st.selectbox("Objetivo do Treino", options=goals + ["Adicionar novo..."])
-if goal == "Adicionar novo":
+if goal == "Adicionar novo...":
     goal = st.text_input("Insira o novo Objetivo")
 
 # Session Type
