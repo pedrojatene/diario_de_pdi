@@ -43,7 +43,7 @@ if player == "Adicionar novo...":
             </div>
             """, unsafe_allow_html=True)
     with col2:
-        player = st.text_input("")
+        player = st.text_input("", key="new_player")
 
 # Training Goal
 goal = st.selectbox("Objetivo do Treino", options=goals + ["Adicionar novo..."])
@@ -57,7 +57,7 @@ if goal == "Adicionar novo...":
             </div>
             """, unsafe_allow_html=True)
     with col2:
-        goal = st.text_input("")
+        goal = st.text_input("", key="new_goal")
 
 # Session Type
 session_type = st.selectbox("Tipo de Sessão", options=sessions + ["Adicionar novo..."])
@@ -71,7 +71,7 @@ if session_type == "Adicionar novo...":
             </div>
             """, unsafe_allow_html=True)
     with col2:
-        session_type = st.text_input("")
+        session_type = st.text_input("", key="new_session_type")
 
 # Date Picker
 session_date = st.date_input("Date", value=date.today())
