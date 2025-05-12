@@ -19,7 +19,7 @@ players, goals, sessions = get_dropdown_options()
 
 # Player Name
 player = st.selectbox("Nome do Atleta", options=players + ["Adicionar novo..."])
-if player == "Nome do Atleta":
+if player == "Adicionar novo...":
     player = st.text_input("Insira o novo Atleta")
 
 # Training Goal
