@@ -73,11 +73,17 @@ if session_type == "Adicionar novo...":
     with col2:
         session_type = st.text_input("", key="new_session_type")
 
-# Date Picker
-session_date = st.date_input("Date", value=date.today())
 
-# Submit Button
-if st.button("Registrar Treino"):
+col1, col2 = st.columns([1, 1])  # Wider for date input, narrower for button
+
+with col1:
+    session_date = st.date_input("Data", value=date.today())
+
+with col2:
+    st.markdown("<div style='height: 32px;'></div>", unsafe_allow_html=True)  # vertical spacer
+    submit = st.button("Registrar Treino")
+
+if submit:
     if all([player, goal, session_type, session_date]):
         append_row_to_sheet(player, goal, session_type, session_date)
         st.success("Treino registrado com sucesso!")
