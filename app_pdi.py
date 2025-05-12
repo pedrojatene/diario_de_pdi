@@ -32,36 +32,46 @@ st.header("🗓️ Registro de Atividades Individuais")
 players, goals, sessions = get_dropdown_options()
 
 # Player Name
-#player = st.selectbox("Nome do Atleta", options=players + ["Adicionar novo..."])
-#if player == "Adicionar novo...":
-#    player = st.text_input("Insira o novo Atleta")
-
 player = st.selectbox("Nome do Atleta", options=players + ["Adicionar novo..."])
 if player == "Adicionar novo...":
-    col1, col2 = st.columns([1, 2])  # Adjust ratio for better spacing
-
+    col1, col2 = st.columns([1, 2])
     with col1:
         st.markdown(
             """
             <div style='display: flex; align-items: center; justify-content: flex-end; height: 38px;'>
                 <span style='color: red;'>Insira o novo Atleta</span>
             </div>
-            """,
-            unsafe_allow_html=True
-        )
-
+            """, unsafe_allow_html=True)
     with col2:
         player = st.text_input("")
 
 # Training Goal
 goal = st.selectbox("Objetivo do Treino", options=goals + ["Adicionar novo..."])
 if goal == "Adicionar novo...":
-    goal = st.text_input("Insira o novo Objetivo")
+    col1, col2 = st.columns([1, 2])
+    with col1:
+        st.markdown(
+            """
+            <div style='display: flex; align-items: center; justify-content: flex-end; height: 38px;'>
+                <span style='color: red;'>Insira o novo Objetivo</span>
+            </div>
+            """, unsafe_allow_html=True)
+    with col2:
+        goal = st.text_input("")
 
 # Session Type
 session_type = st.selectbox("Tipo de Sessão", options=sessions + ["Adicionar novo..."])
 if session_type == "Adicionar novo...":
-    session_type = st.text_input("Insira o novo Tipo de Sessão")
+    col1, col2 = st.columns([1, 2])
+    with col1:
+        st.markdown(
+            """
+            <div style='display: flex; align-items: center; justify-content: flex-end; height: 38px;'>
+                <span style='color: red;'>Insira o novo Tipo de Sessão</span>
+            </div>
+            """, unsafe_allow_html=True)
+    with col2:
+        session_type = st.text_input("")
 
 # Date Picker
 session_date = st.date_input("Date", value=date.today())
