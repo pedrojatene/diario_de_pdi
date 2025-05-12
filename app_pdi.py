@@ -34,7 +34,7 @@ if auth_status:
     # 🔽 your main app starts here
 
 
-# Apply custom CSS for Helvetica Neue font
+    # Apply custom CSS for Helvetica Neue font
     st.markdown("""
         <style>
         @import url('https://fonts.googleapis.com/css2?family=Helvetica+Neue&display=swap');
@@ -119,8 +119,8 @@ if auth_status:
         if all([player, goal, session_type, session_date]):
             append_row_to_sheet(player, goal, session_type, session_date)
             st.success("Treino registrado com sucesso!")
-    else:
-        st.error("Preencha todos os campos.")
+        else:
+            st.error("Preencha todos os campos.")
 
 elif auth_status is False:
     st.error("Usuário ou senha incorretos")
