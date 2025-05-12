@@ -1,3 +1,6 @@
 streamlit
 gspread
 google-auth
+oauth2client
+pandas
+numpy
