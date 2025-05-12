@@ -48,29 +48,29 @@ if player == "Adicionar novo...":
 # Training Goal
 goal = st.selectbox("Objetivo do Treino", options=goals + ["Adicionar novo..."])
 if goal == "Adicionar novo...":
-    col1, col2 = st.columns([1, 2])
-    with col1:
+    col1, col2, col3 = st.columns([1, 1, 2])
+    with col2:
         st.markdown(
             """
             <div style='display: flex; align-items: center; justify-content: flex-end; height: 38px;'>
                 <span style='color: red;'>Insira o novo Objetivo</span>
             </div>
             """, unsafe_allow_html=True)
-    with col2:
+    with col3:
         goal = st.text_input("", key="new_goal")
 
 # Session Type
 session_type = st.selectbox("Tipo de Sessão", options=sessions + ["Adicionar novo..."])
 if session_type == "Adicionar novo...":
-    col1, col2 = st.columns([1, 2])
-    with col1:
+    col1, col2, col3 = st.columns([1, 1, 2])
+    with col2:
         st.markdown(
             """
             <div style='display: flex; align-items: center; justify-content: flex-end; height: 38px;'>
                 <span style='color: red;'>Insira o novo Tipo de Sessão</span>
             </div>
             """, unsafe_allow_html=True)
-    with col2:
+    with col3:
         session_type = st.text_input("", key="new_session_type")
 
 # Data e submissão
