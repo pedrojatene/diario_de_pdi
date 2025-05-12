@@ -1,6 +1,42 @@
+import yaml
+from yaml.loader import SafeLoader
+import streamlit_authenticator as stauth
 import streamlit as st
 from sheets_api import get_dropdown_options, append_row_to_sheet
 from datetime import date
+
+
+with open('config.yaml') as file:
+    config = yaml.load(file, Loader=SafeLoader)
+
+authenticator = stauth.Authenticate(
+    config['credentials'],
+    config['cookie']['name'],
+    config['cookie']['key'],
+    config['cookie']['expiry_days']
+)
+
+name, auth_status, username = authenticator.login(
+    location='main',
+    fields={
+        'Form name': 'Login',
+        'Username': 'Usuário',
+        'Password': 'Senha',
+        'Login': 'Entrar'
+    }
+)
+
+if auth_status is False:
+    st.error('Usuário ou senha incorretos')
+elif auth_status is None:
+    st.warning('Insira seu login e senha')
+else:
+    authenticator.logout('Logout', 'main')
+    st.write(f"👋🏼 Bem-vindo, *{name}*")
+
+
+    # 🔽 your main app starts here
+
 
 # Apply custom CSS for Helvetica Neue font
 st.markdown("""

@@ -1,0 +1,37 @@
+credentials:
+  usernames:
+    pedrojatene:
+      name: Pedro Jatene
+      email: pedrojatene@gmail.com
+      password: $2b$12$GPx.tH23aDY7rEwlmR4qQeLQdxdVoCqreKKMZgnbbNugJg9NfTkaG
+      roles: ['admin']
+    pedro.salles:
+      name: Pedro Henrique Salles
+      email: pedro.salles@saopaulofc.net
+      password: $2b$12$BHiBSX6DGv9WMa0dRjdjdeNb/fn2.IrPNs1ngGjIgQfKOih0KjRrO
+      roles: ['user']
+    murilo.rossi:
+      name: Murilo Rossi
+      email: murilo.rossi@saopaulofc.net
+      password: $2b$12$2LIJiGknGdEiDcPCJJKmj.70UNlOI/YCEb9dkPol2q8B1Z5sAqXQu
+      roles: ['user']
+    gabriel.monteiro:
+      name: Gabriel Monteiro
+      email: gabriel.monteiro@saopaulofc.net
+      password: $2b$12$tsxhvoN1XPX77xXgAH5d7.7Q1Bt0bkS/p4gmnQITX9GojLXALNBsC
+      roles: ['user']
+    felipe.almeida:
+      name: Felipe Silva
+      email: felipe.almeida@saopaulofc.net
+      password: $2b$12$tJlu8wTA4eToJLkYd8zQluOeuEKS2ph6eBtL4GrXiyjeOEnu5WoTu
+      roles: ['user']
+    bruno.secco:
+      name: Bruno Secco
+      email: bruno.secco@saopaulofc.net
+      password: $2b$12$FAmboRiaT/8VpaVuNO70EONgnH5qSU2wBCAEi7rQ7M2U8YhXW51QK
+      roles: ['user']
+
+cookie:
+  expiry_days: 30
+  key: "supersecretkey"
+  name: "pdi_auth"
