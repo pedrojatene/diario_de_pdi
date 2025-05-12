@@ -12,33 +12,33 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-st.title("🏋️ Training Session Logger")
+st.title("🗓️ Registro de Atividades Individuais")
 
 # Load dropdown options
 players, goals, sessions = get_dropdown_options()
 
 # Player Name
-player = st.selectbox("Player Name", options=players + ["Add new..."])
-if player == "Add new...":
-    player = st.text_input("Enter new player name")
+player = st.selectbox("Nome do Atleta", options=players + ["Adicionar novo..."])
+if player == "Nome do Atleta":
+    player = st.text_input("Insira o novo Atleta")
 
 # Training Goal
-goal = st.selectbox("Training Goal", options=goals + ["Add new..."])
-if goal == "Add new...":
-    goal = st.text_input("Enter new training goal")
+goal = st.selectbox("Objetivo do Treino", options=goals + ["Adicionar novo..."])
+if goal == "Objetivo do Treino":
+    goal = st.text_input("Insira o novo Objetivo")
 
 # Session Type
-session_type = st.selectbox("Session Type", options=sessions + ["Add new..."])
-if session_type == "Add new...":
-    session_type = st.text_input("Enter new session type")
+session_type = st.selectbox("Tipo de Sessão", options=sessions + ["Adicionar novo..."])
+if session_type == "Tipo de Sessão":
+    session_type = st.text_input("Insira o novo Tipo de Sessão")
 
 # Date Picker
 session_date = st.date_input("Date", value=date.today())
 
 # Submit Button
-if st.button("Submit"):
+if st.button("Registrar Treino"):
     if all([player, goal, session_type, session_date]):
         append_row_to_sheet(player, goal, session_type, session_date)
-        st.success("Training session logged successfully!")
+        st.success("Treino registrado com sucesso!")
     else:
-        st.error("Please fill in all fields.")
+        st.error("Preencha todos os campos.")
