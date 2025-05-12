@@ -5,16 +5,28 @@ from datetime import date
 # Apply custom CSS for Helvetica Neue font
 st.markdown("""
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Helvetica+Neue:300&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Helvetica+Neue&display=swap');
+
     html, body, [class*="css"] {
         font-family: 'Helvetica Neue', sans-serif;
-        font-weight: 300;
-        font-size: 14px;
+    }
+
+    .block-container {
+        padding-top: 2rem;
+        padding-bottom: 2rem;
+        padding-left: 2rem;
+        padding-right: 2rem;
+        max-width: none;
+    }
+
+    h1 {
+        text-align: left;
+        width: 100%;
     }
     </style>
     """, unsafe_allow_html=True)
 
-st.title("🗓️ Registro de Atividades Individuais")
+st.header("🗓️ Registro de Atividades Individuais")
 
 # Load dropdown options
 players, goals, sessions = get_dropdown_options()
