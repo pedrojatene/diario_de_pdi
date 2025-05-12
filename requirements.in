@@ -1,0 +1,8 @@
+streamlit
+streamlit-authenticator==0.3.3
+gspread
+google-auth
+oauth2client
+pandas
+numpy
+PyYAML
