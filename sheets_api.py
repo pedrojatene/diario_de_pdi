@@ -19,9 +19,9 @@ sheet = client.open_by_url(SHEET_URL).sheet1
 
 def get_dropdown_options():
     records = sheet.get_all_records()
-    players = sorted(set(row["playerName"] for row in records if row["playerName"]))
-    goals = sorted(set(row["trainingGoal"] for row in records if row["trainingGoal"]))
-    sessions = sorted(set(row["sessionType"] for row in records if row["sessionType"]))
+    players = sorted(set(row["Nome"] for row in records if row["Nome"]))
+    goals = sorted(set(row["Objetivo"] for row in records if row["Objetivo"]))
+    sessions = sorted(set(row["Sessão"] for row in records if row["Sessão"]))
     return players, goals, sessions
 
 def append_row_to_sheet(player, goal, session_type, session_date):
