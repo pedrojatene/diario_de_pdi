@@ -38,7 +38,14 @@ players, goals, sessions = get_dropdown_options()
 
 player = st.selectbox("Nome do Atleta", options=players + ["Adicionar novo..."])
 if player == "Adicionar novo...":
-    st.markdown('<span style="color: red">Insira o novo Atleta</span>', unsafe_allow_html=True)
+    st.markdown(
+        """
+        <div style='margin-bottom: -10px;'>
+            <span style='color: red;'>Insira o novo Atleta</span>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
     player = st.text_input("")
 
 # Training Goal
