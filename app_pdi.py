@@ -28,7 +28,7 @@ name, auth_status, username = authenticator.login(
 
 if auth_status:
     authenticator.logout('Logout', 'main')
-    st.write(f"👋🏼 Bem-vindo, *{name}*")
+    st.write(f"👋🏼 *Bem-vindo, {name}*")
 
 
     # 🔽 your main app starts here
