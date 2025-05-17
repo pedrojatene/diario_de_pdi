@@ -142,13 +142,13 @@ if auth_status:
         tab1, tab2, tab3 = st.tabs(["Por Atleta", "Por Objetivo", "Todos os Registros"])
 
         with tab1:
-            st.subheader("📌 Dados por Atleta")
+            st.subheader("👤 Dados por Atleta")
             st.write("Em breve: filtros, tabelas e gráficos personalizados por atleta.")
 
         with tab2:
-            st.subheader("🎯 Dados por Objetivo/Sessão")
+            st.subheader("🎯 Dados por Objetivo")
             st.write("Em breve: agrupamentos por tipo de treino e objetivo.")
 
         with tab3:
-            st.subheader("📊 Todos os Dados")
+            st.subheader("📋 Todos os Dados")
             st.write("Em breve: tabela completa com todas as submissões.")
