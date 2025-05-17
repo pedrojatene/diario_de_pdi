@@ -146,8 +146,8 @@ if auth_status:
             st.write("Em breve: filtros, tabelas e gráficos personalizados por atleta.")
 
         with tab2:
-        st.subheader("🎯 Dados por Objetivo/Sessão")
-        st.write("Em breve: agrupamentos por tipo de treino e objetivo.")
+            st.subheader("🎯 Dados por Objetivo/Sessão")
+            st.write("Em breve: agrupamentos por tipo de treino e objetivo.")
 
         with tab3:
             st.subheader("📊 Todos os Dados")
