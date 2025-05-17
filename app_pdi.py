@@ -130,7 +130,8 @@ if auth_status:
 
         if submit:
             if all([player, goal, session_type, session_date]):
-                append_row_to_sheet(player, goal, session_type, session_date)
+                formatted_date = session_date.strftime("%Y/%m/%d")
+                append_row_to_sheet(player, goal, session_type, formatted_date)
                 st.success("Treino registrado com sucesso!")
             else:
                 st.error("Preencha todos os campos.")
