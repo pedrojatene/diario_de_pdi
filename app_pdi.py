@@ -6,10 +6,9 @@ import pandas as pd
 import gspread
 from google.oauth2 import service_account
 from google.oauth2.service_account import Credentials
+
 from sheets_api import get_dropdown_options, append_row_to_sheet
 from datetime import date
-from datetime import datetime
-import os
 
 st.set_page_config(
     page_title="Diário de PDI",
@@ -131,8 +130,7 @@ if auth_status:
 
         if submit:
             if all([player, goal, session_type, session_date]):
-                formatted_date = datetime.combine(session_date, datetime.min.time())
-                append_row_to_sheet(player, goal, session_type, formatted_date)
+                append_row_to_sheet(player, goal, session_type, session_date)
                 st.success("Treino registrado com sucesso!")
             else:
                 st.error("Preencha todos os campos.")
