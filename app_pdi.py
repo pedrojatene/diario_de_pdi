@@ -243,5 +243,23 @@ if auth_status:
                 df = df[priority + remaining]
 
                 st.dataframe(df, use_container_width=True, height=600)
+
+                # --- Gráfico de sessões por dia ------------------------------------------
+                st.subheader("Sessões por Dia (após filtros)")
+
+                # Conta quantas linhas restam por data
+                daily_counts = (
+                    df.groupby("Data")
+                    .size()
+                    .reset_index(name="Sessões")
+                    .sort_values("Data")          # datas em ordem cronológica
+                )
+
+                st.bar_chart(
+                    data=daily_counts,
+                    x="Data",
+                    y="Sessões",
+                    height=300,
+                )
             else:
                 st.info("Nenhum dado encontrado na planilha.")
