@@ -278,7 +278,7 @@ if auth_status:
 
                 chart = (
                     (bar + avg_line)
-                    .properties(width=700, height=400, title="Número de Sessões por Dia \u2014 média: {:.1f}".format(avg_value))
+                    .properties(title="Número de Sessões por Dia \u2014 média: {:.1f}".format(avg_value))
                 )
 
                 st.altair_chart(chart, use_container_width=True)
