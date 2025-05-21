@@ -152,3 +152,4 @@ tzdata==2025.2
     # via pandas
 urllib3==2.4.0
     # via requests
+matplotlib>=3.7
