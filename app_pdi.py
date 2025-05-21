@@ -131,7 +131,9 @@ if auth_status:
 
         if submit:
             if all([player, goal, session_type, session_date]):
-                append_row_to_sheet(player, goal, session_type, session_date)
+        # ✅ format as DD/MM/YYYY so Sheets (Brazilian locale) recognises the date
+                locale_date = session_date.strftime("%d/%m/%Y")
+                append_row_to_sheet(player, goal, session_type, locale_date)
                 st.success("Treino registrado com sucesso!")
             else:
                 st.error("Preencha todos os campos.")
