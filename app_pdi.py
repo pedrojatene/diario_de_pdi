@@ -160,60 +160,69 @@ if auth_status:
         with tab3:
             st.subheader("📋 Todos os Dados")
 
-            from datetime import date
+            # --- constants for date limits ---
+            from datetime import date, timedelta
             min_date = date(2025, 5, 5)
             max_date = date.today()
 
-            # Using existing imports and credentials
-            credentials = service_account.Credentials.from_service_account_info(
+            # --- load sheet into DataFrame ---
+            creds = service_account.Credentials.from_service_account_info(
                 st.secrets["gcp_service_account"],
                 scopes=["https://www.googleapis.com/auth/spreadsheets"]
             )
-
-            client = gspread.authorize(credentials)
-            sheet = client.open_by_url(st.secrets["gcp_service_account"]["private_gsheets_url"]).sheet1
-
-            records = sheet.get_all_records()
+            client = gspread.authorize(creds)
+            ws = client.open_by_url(st.secrets["gcp_service_account"]["private_gsheets_url"]).sheet1
+            records = ws.get_all_records()
             df = pd.DataFrame(records)
+
+            # remove legacy ID column if present
             if "ID" in df.columns:
                 df = df.drop(columns=["ID"])
 
             if not df.empty:
-                df["Data"] = pd.to_datetime(df["Data"], format="%d/%m/%Y", errors='coerce')
-                df = df.sort_values(by="Data", ascending=False)
-
-                # 🔄 Harmonize column names for filtering
-                col_map = {
+                # --- harmonise column names -------------------------------------------------
+                rename_map = {
                     "playerName": "Nome",
                     "trainingGoal": "Objetivo",
-                    "sessionType": "Sessão"
+                    "sessionType": "Sessão",
+                    "date": "Data"  # in case the header is lowercase
                 }
-                df = df.rename(columns={k: v for k, v in col_map.items() if k in df.columns})
+                df = df.rename(columns={k: v for k, v in rename_map.items() if k in df.columns})
+
+                # --- parse date column -------------------------------------------------------
+                df["Data"] = pd.to_datetime(df["Data"], format="%d/%m/%Y", errors="coerce")
                 df = df.dropna(subset=["Data"])
                 df["Data"] = df["Data"].dt.date
+                df = df.sort_values(by="Data", ascending=False)
 
-                # Add weekday name in Portuguese
+                # --- add weekday name --------------------------------------------------------
                 dias_semana = {
                     0: "Segunda", 1: "Terça", 2: "Quarta", 3: "Quinta",
                     4: "Sexta", 5: "Sábado", 6: "Domingo"
                 }
                 df["Dia da Semana"] = df["Data"].apply(lambda x: dias_semana[x.weekday()])
 
-                players, goals, sessions = get_dropdown_options()
-                atletas = players
-                objetivos = goals
-                sessoes = sessions
+                # --- dynamic filter choices --------------------------------------------------
+                atletas = sorted(df["Nome"].unique())
+                objetivos = sorted(df["Objetivo"].unique())
+                sessoes = sorted(df["Sessão"].unique())
 
                 col1, col2, col3, col4 = st.columns(4)
                 with col1:
-                    atleta_filter = st.selectbox("Filtrar por Atleta", options=["Todos"] + atletas)
+                    atleta_filter = st.selectbox("Filtrar por Atleta", ["Todos"] + atletas)
                 with col2:
-                    objetivo_filter = st.selectbox("Filtrar por Objetivo", options=["Todos"] + objetivos)
+                    objetivo_filter = st.selectbox("Filtrar por Objetivo", ["Todos"] + objetivos)
                 with col3:
-                    sessao_filter = st.selectbox("Filtrar por Sessão", options=["Todos"] + sessoes)
+                    sessao_filter = st.selectbox("Filtrar por Sessão", ["Todos"] + sessoes)
                 with col4:
-                    date_range = st.date_input("Filtrar por Período", value=(min_date, max_date), min_value=min_date, max_value=max_date)
+                    date_range = st.date_input(
+                        "Período",
+                        value=(min_date, max_date),
+                        min_value=min_date,
+                        max_value=max_date,
+                    )
 
+                # --- apply filters ------------------------------------------------------------
                 if atleta_filter != "Todos":
                     df = df[df["Nome"] == atleta_filter]
                 if objetivo_filter != "Todos":
@@ -223,12 +232,12 @@ if auth_status:
                 if date_range and all(date_range):
                     df = df[(df["Data"] >= date_range[0]) & (df["Data"] <= date_range[1])]
 
-
-                # Reorder columns to put 'Nome', 'Data' and  first if they exist
+                # --- column order: Nome, Data first ------------------------------------------
                 cols = df.columns.tolist()
-                priority_cols = [col for col in ["Nome", "Data", "Dia da Semana"] if col in cols]
-                other_cols = [col for col in cols if col not in priority_cols]
-                df = df[priority_cols + other_cols]
+                priority = [c for c in ["Nome", "Data"] if c in cols]
+                remaining = [c for c in cols if c not in priority]
+                df = df[priority + remaining]
+
                 st.dataframe(df, use_container_width=True, height=600)
             else:
                 st.info("Nenhum dado encontrado na planilha.")
