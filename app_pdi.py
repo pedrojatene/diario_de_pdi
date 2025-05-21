@@ -42,7 +42,7 @@ if auth_status:
     authenticator.logout('Logout', 'main')
     st.sidebar.write(f"*Bem-vindo, {name}*")
 
-    page = st.sidebar.radio("Navegar para:", ["Registrar Treino", "Visualizar Registros"])
+    page = st.sidebar.radio("Navegar para:", ["Registrar Treino", "Visualizar Dados"])
     if page == "Registrar Treino":
 
 
@@ -145,10 +145,10 @@ if auth_status:
         st.warning("Insira seu login e senha para continuar")
 
     # Visualizar Registros
-    elif page == "Visualizar Registros":
-        st.header("📊 Visualização de Registros")
+    elif page == "Visualizar Dados":
+        st.header("📊 Visualização de Dados")
         
-        tab1, tab2, tab3 = st.tabs(["Por Atleta", "Por Objetivo", "Todos os Registros"])
+        tab1, tab2, tab3 = st.tabs(["Por Atleta", "Por Objetivo", "Todos os Dados"])
 
         with tab1:
             st.subheader("👤 Dados por Atleta")
