@@ -262,7 +262,7 @@ if auth_status:
                         y=alt.Y("Sessões:Q", title=None),
                         tooltip=[alt.Tooltip("Data:T", title="Data"),
                                  alt.Tooltip("Sessões:Q", title="Sessões"),
-                                 alt.Tooltip("Atletas:N", title="Atletas")]
+                                 alt.Tooltip("Nome:N", title="Atletas")]
                     )
                 )
 
