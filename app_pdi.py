@@ -159,8 +159,6 @@ if auth_status:
             st.write("Em breve: agrupamentos por tipo de treino e objetivo.")
 
         with tab3:
-            st.subheader("📋 Todos os Dados")
-
             # --- constants for date limits ---
             from datetime import date, timedelta
             min_date = date(2025, 5, 5)
@@ -203,10 +201,45 @@ if auth_status:
                 }
                 df["Dia da Semana"] = df["Data"].apply(lambda x: dias_semana[x.weekday()])
 
+                
+            # --- 📊 SUMMARY ANTES DA LISTA DINÂMICA -------------------------------------------
+                # df_clean contém todos os dados de min_date até hoje (sem filtros de atleta/objetivo)
+                df_clean = df.copy()
+                summary = (
+                    df_clean.groupby(["Nome", "Objetivo"]).size().unstack(fill_value=0)
+                )
+                summary["Total"] = summary.sum(axis=1)
+                grand_total = summary.sum(axis=0).to_frame().T
+                grand_total.index = ["TOTAL"]
+                summary = pd.concat([summary, grand_total])
+
+                st.subheader("📌 Resumo Geral ({} a {})".format(min_date.strftime('%d/%m/%Y'),
+                    max_date.strftime('%d/%m/%Y')))
+
+                numeric_cols = summary.select_dtypes("number").columns
+                idx = pd.IndexSlice
+
+                # Apply gradient per column, exclude the TOTAL row
+                styled_summary = (
+                    summary.style
+                           .background_gradient(cmap="Reds", subset=idx[summary.index != "TOTAL", numeric_cols], axis=0)
+                )
+
+                row_px = 36
+                header_px = 56
+                buffer_px = 12
+                dyn_height = header_px + row_px * (len(summary)+1) + buffer_px
+
+                st.dataframe(styled_summary, use_container_width=True, height=dyn_height)
+
+
+                # LISTA DINÂMICA
                 # --- dynamic filter choices --------------------------------------------------
                 atletas = sorted(df["Nome"].unique())
                 objetivos = sorted(df["Objetivo"].unique())
                 sessoes = sorted(df["Sessão"].unique())
+
+                st.subheader("📋 Lista Dinâmica")
 
                 col1, col2, col3, col4 = st.columns(4)
                 with col1:
@@ -257,7 +290,7 @@ if auth_status:
 
                 bar = (
                     alt.Chart(daily_counts)
-                    .mark_bar(color="#D30000", opacity=0.95, size=28)
+                    .mark_bar(color="#D30000", opacity=0.95, size=24)
                     .encode(
                         x=alt.X("Data:T", title="Data"),
                         y=alt.Y("Sessões:Q", title=None),
