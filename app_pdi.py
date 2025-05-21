@@ -181,6 +181,14 @@ if auth_status:
             if not df.empty:
                 df["Data"] = pd.to_datetime(df["Data"], errors='coerce')
                 df = df.sort_values(by="Data", ascending=False)
+
+                # 🔄 Harmonize column names for filtering
+                col_map = {
+                    "playerName": "Nome",
+                    "trainingGoal": "Objetivo",
+                    "sessionType": "Sessão"
+                }
+                df = df.rename(columns={k: v for k, v in col_map.items() if k in df.columns})
                 df = df.dropna(subset=["Data"])
                 df["Data"] = df["Data"].dt.date
 
