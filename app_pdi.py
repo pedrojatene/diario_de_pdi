@@ -232,13 +232,13 @@ if auth_status:
                 if date_range and all(date_range):
                     df = df[(df["Data"] >= date_range[0]) & (df["Data"] <= date_range[1])]
 
-                # --- regenerate sequential ID descending -----------------------------------------
+                # --- make Streamlit's index a descending counter -----------------------------
                 df = df.reset_index(drop=True)
-                df.insert(0, "ID", range(len(df), 0, -1))
+                df.index = range(len(df), 0, -1)  # index column will show N → 1
 
-                # --- column order: ID, Nome, Data first -------------------------------------
+                # --- column order: Nome, Data first -----------------------------------------
                 cols = df.columns.tolist()
-                priority = [c for c in ["ID", "Nome", "Data"] if c in cols]
+                priority = [c for c in ["Nome", "Data"] if c in cols]
                 remaining = [c for c in cols if c not in priority]
                 df = df[priority + remaining]
 
