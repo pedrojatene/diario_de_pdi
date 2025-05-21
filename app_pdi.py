@@ -249,8 +249,9 @@ if auth_status:
                 # Conta quantas linhas restam por data
                 daily_counts = (
                     df.groupby("Data")
-                    .size()
-                    .reset_index(name="Sessões")
+                    .agg(Sessões=("Nome","size"),
+                         Atletas=("Nome", lambda x: ", ".join(sorted(x.unique()))))
+                    .reset_index()
                     .sort_values("Data")          # datas em ordem cronológica
                 )
 
@@ -262,7 +263,7 @@ if auth_status:
                         y=alt.Y("Sessões:Q", title=None),
                         tooltip=[alt.Tooltip("Data:T", title="Data"),
                                  alt.Tooltip("Sessões:Q", title="Sessões"),
-                                 alt.Tooltip("Nome:N", title="Atletas")]
+                                 alt.Tooltip("Atletas:N", title="Atletas")]
                     )
                 )
 
