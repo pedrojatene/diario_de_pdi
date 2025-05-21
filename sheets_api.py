@@ -24,13 +24,13 @@ def get_dropdown_options():
     sessions = sorted(set(row["Sessão"] for row in records if row["Sessão"]))
     return players, goals, sessions
 
-def append_row_to_sheet(player, goal, session_type, session_date):
+def append_row_to_sheet(player, goal, session_type, date_string):
     next_id = len(sheet.get_all_values())  # Assuming header is in the first row
     new_row = [
         str(next_id),
         player,
         goal,
         session_type,
-        session_date.strftime("%Y-%m-%d"),
+        date_string,  # already in DD/MM/YYYY format
     ]
-    sheet.append_row(new_row)
+    sheet.append_row(new_row, value_input_option="USER_ENTERED")
