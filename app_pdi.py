@@ -179,7 +179,7 @@ if auth_status:
                 df = df.drop(columns=["ID"])
 
             if not df.empty:
-                df["Data"] = pd.to_datetime(df["Data"], errors='coerce')
+                df["Data"] = pd.to_datetime(df["Data"], format="%d/%m/%Y", errors='coerce')
                 df = df.sort_values(by="Data", ascending=False)
 
                 # 🔄 Harmonize column names for filtering
