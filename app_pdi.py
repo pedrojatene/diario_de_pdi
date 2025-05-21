@@ -10,6 +10,7 @@ from google.oauth2.service_account import Credentials
 from sheets_api import get_dropdown_options, append_row_to_sheet
 from datetime import date
 from datetime import datetime
+import altair as alt
 
 st.set_page_config(
     page_title="Diário de PDI",
@@ -242,11 +243,9 @@ if auth_status:
                 remaining = [c for c in cols if c not in priority]
                 df = df[priority + remaining]
 
-                st.dataframe(df, use_container_width=True, height=600)
+                st.dataframe(df, use_container_width=True, height=400)
 
                 # --- Gráfico de sessões por dia ------------------------------------------
-                st.subheader("Sessões por Dia (após filtros)")
-
                 # Conta quantas linhas restam por data
                 daily_counts = (
                     df.groupby("Data")
@@ -255,11 +254,33 @@ if auth_status:
                     .sort_values("Data")          # datas em ordem cronológica
                 )
 
-                st.bar_chart(
-                    data=daily_counts,
-                    x="Data",
-                    y="Sessões",
-                    height=300,
+                bar = (
+                    alt.Chart(daily_counts)
+                    .mark_bar(color="#D30000", opacity=0.95, size=28)
+                    .encode(
+                        x=alt.X("Data:T", title="Data"),
+                        y=alt.Y("Sessões:Q", title=None),
+                        tooltip=[alt.Tooltip("Data:T", title="Data"),
+                                 alt.Tooltip("Sessões:Q", title="Sessões"),
+                                 alt.Tooltip("Atletas:N", title="Atletas")]
+                    )
                 )
+
+                # --- average line -----------------------------------------------------------
+                avg_value = float(daily_counts["Sessões"].mean())
+                avg_df = pd.DataFrame({"MÉDIA": [avg_value]})
+                avg_line = (
+                    alt.Chart(avg_df)
+                       .mark_rule(color="#000000", opacity=0.9, size=2, strokeDash=[4,4])
+                       .encode(y="MÉDIA:Q")
+                )
+
+                chart = (
+                    (bar + avg_line)
+                    .properties(width=700, height=400, title="Número de Sessões por Dia \u2014 média: {:.1f}".format(avg_value))
+                )
+
+                st.altair_chart(chart, use_container_width=True)
+
             else:
                 st.info("Nenhum dado encontrado na planilha.")
