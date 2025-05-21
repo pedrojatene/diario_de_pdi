@@ -220,9 +220,13 @@ if auth_status:
                 idx = pd.IndexSlice
 
                 # Apply gradient per column, exclude the TOTAL row
+                def highlight_grand_total(row):
+                    return ['background-color: #D9D9D9' if row.name == 'TOTAL' else '' for _ in row]
+
                 styled_summary = (
                     summary.style
                            .background_gradient(cmap="Reds", subset=idx[summary.index != "TOTAL", numeric_cols], axis=0)
+                           .apply(highlight_grand_total, axis=1)
                 )
 
                 row_px = 36
