@@ -39,7 +39,7 @@ name, auth_status, username = authenticator.login(
 )
 
 if auth_status:
-    authenticator.logout('Logout', 'main')
+    authenticator.logout('Logout', 'sidebar')
     st.sidebar.write(f"*Bem-vindo, {name}*")
 
     page = st.sidebar.radio("Navegar para:", ["Registrar Treino", "Visualizar Dados"])
