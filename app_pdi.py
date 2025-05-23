@@ -148,17 +148,17 @@ if auth_status:
     elif page == "Visualizar Dados":
         st.header("📊 Visualização de Dados")
         
-        tab1, tab2, tab3 = st.tabs(["Por Atleta", "Por Objetivo", "Todos os Dados"])
+        tab2, tab3, tab1 = st.tabs(["Por Atleta", "Por Objetivo", "Todos os Dados"])
 
-        with tab1:
+        with tab2:
             st.subheader("👤 Dados por Atleta")
             st.write("Em breve: filtros, tabelas e gráficos personalizados por atleta.")
 
-        with tab2:
+        with tab3:
             st.subheader("🎯 Dados por Objetivo")
             st.write("Em breve: agrupamentos por tipo de treino e objetivo.")
 
-        with tab3:
+        with tab1:
             # --- constants for date limits ---
             from datetime import date, timedelta
             min_date = date(2025, 5, 5)
