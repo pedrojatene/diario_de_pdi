@@ -148,18 +148,10 @@ if auth_status:
     elif page == "Visualizar Dados":
         st.header("📊 Visualização de Dados")
         
-        tab2, tab3, tab1 = st.tabs(["Por Atleta", "Por Objetivo", "Todos os Dados"])
-
-        with tab2:
-            st.subheader("👤 Dados por Atleta")
-            st.write("Em breve: filtros, tabelas e gráficos personalizados por atleta.")
-
-        with tab3:
-            st.subheader("🎯 Dados por Objetivo")
-            st.write("Em breve: agrupamentos por tipo de treino e objetivo.")
+        tab1, tab2, tab3 = st.tabs(["Todos os Dados", "Por Atleta", "Por Objetivo"])
 
         with tab1:
-            # --- constants for date limits ---
+                        # --- constants for date limits ---
             from datetime import date, timedelta
             min_date = date(2025, 5, 5)
             max_date = date.today()
@@ -322,3 +314,12 @@ if auth_status:
 
             else:
                 st.info("Nenhum dado encontrado na planilha.")
+
+
+        with tab2:
+            st.subheader("👤 Dados por Atleta")
+            st.write("Em breve: agrupamentos por tipo de treino e objetivo.")
+
+        with tab3:
+            st.subheader("🎯 Dados por Objetivo")
+            st.write("Em breve: filtros, tabelas e gráficos personalizados por atleta.")
