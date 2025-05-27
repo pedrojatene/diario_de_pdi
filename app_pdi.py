@@ -317,8 +317,142 @@ if auth_status:
 
 
         with tab2:
-            st.subheader("👤 Dados por Atleta")
-            st.write("Em breve: agrupamentos por tipo de treino e objetivo.")
+            # --- pick athlete & date‑range side by side -----------------
+            colA, colB = st.columns(2)
+
+            with colA:
+                atleta_escolhido = st.selectbox(
+                    "Selecione o atleta",
+                    sorted(df_clean["Nome"].unique())
+                )
+
+            with colB:
+                periodo = st.date_input(
+                    "Período",
+                    value=(min_date, max_date),
+                    min_value=min_date,
+                    max_value=max_date,
+                    key="periodo_atleta"
+                )
+
+            if atleta_escolhido and periodo and all(periodo):
+
+                # --- filter by athlete & chosen dates -------------------
+                df_player = df_clean[
+                    (df_clean["Nome"] == atleta_escolhido) &
+                    (df_clean["Data"] >= periodo[0]) &
+                    (df_clean["Data"] <= periodo[1])
+                ].copy().sort_values("Data", ascending=False)
+
+                # --- reorder columns: Nome, Data first ------------------
+                cols_p     = df_player.columns.tolist()
+                priority_p = [c for c in ["Nome", "Data"] if c in cols_p]
+                df_player  = df_player[priority_p + [c for c in cols_p if c not in priority_p]]
+
+                # --- dynamic height so no scroll ------------------------
+                row_px    = 30
+                header_px = 48
+                buffer_px = 12
+                dyn_h     = header_px + row_px * len(df_player) + buffer_px
+
+                st.subheader(
+                    f"📄 Registros de {atleta_escolhido} "
+                    f"({periodo[0].strftime('%d/%m/%Y')} – {periodo[1].strftime('%d/%m/%Y')})"
+                )
+
+                # --- charts side‑by‑side: sessões por objetivo ----------------------
+                if not df_player.empty:
+                    goal_counts = (
+                        df_player.groupby("Objetivo", dropna=False)
+                                 .size()
+                                 .reset_index(name="Sessões")
+                                 .sort_values("Sessões", ascending=False)
+                    )
+
+                    colC, colD = st.columns(2)
+
+                    my_palette = alt.Scale(range=[
+                        "#E60000", "#CCCCCC", "#656565", "#151515", "#1E90FF",
+                        "#8A2BE2", "#FF69B4", "#FF1493", "#00CED1", "#20B2AA"
+                    ])
+
+                    color_encoding = alt.Color("Objetivo:N", scale=my_palette, legend=None)
+
+                    with colC:
+                        bar = (
+                            alt.Chart(goal_counts)
+                               .mark_bar(size=40, opacity=0.9, color="#FF4B4B")
+                               .encode(
+                                   x=alt.X("Objetivo:N",
+                                           sort="-y",
+                                           title=None,
+                                           axis=alt.Axis(labelAngle=0, grid=False)),
+                                   y=alt.Y("Sessões:Q",
+                                           title=None,
+                                           axis=alt.Axis(grid=False)),
+                                   color=color_encoding,
+                                   tooltip=["Objetivo:N", "Sessões:Q"]
+                               )
+                        )
+
+                        labels = (
+                            alt.Chart(goal_counts)
+                               .mark_text(dy=-9, color="#333", fontSize=13)
+                               .encode(
+                                   x=alt.X("Objetivo:N", sort="-y"),
+                                   y="Sessões:Q",
+                                   text="Sessões:Q"
+                               )
+                        )
+
+                        bar_chart = (bar + labels).properties(
+                            height=350, width="container",
+                            title="Sessões por Objetivo (bar)"
+                        )
+                        st.altair_chart(bar_chart, use_container_width=True)
+
+                    # ---- prepare percentages in pandas ---------------------------------
+                    goal_counts["Percent"] = (
+                        goal_counts["Sessões"] / goal_counts["Sessões"].sum()
+                    )
+
+                    with colD:
+                        base = (
+                            alt.Chart(goal_counts)
+                            .encode(
+                                theta=alt.Theta("Sessões:Q", stack=True),  # cumulative angles
+                                color=color_encoding
+                            )
+                        )
+
+                        # Actual pie slices
+                        pie = (
+                            base.mark_arc(innerRadius=40, outerRadius=120, opacity=0.9)
+                                .encode(
+                                    tooltip=[
+                                        alt.Tooltip("Objetivo:N", title="Objetivo"),
+                                        alt.Tooltip("Sessões:Q", title="Sessões"),
+                                        alt.Tooltip("Percent:Q", title="%", format=".0%")
+                                    ]
+                                )
+                        )
+
+                        # Text labels (white) positioned inside each slice
+                        labels = (
+                            base.mark_text(radius=80, size=14, color="white")
+                                .encode(
+                                    text=alt.Text("Percent:Q", format=".0%")
+                                )
+                        )
+
+                        pie_chart = (pie + labels).properties(
+                            width=300, height=300,
+                            title="Sessões por Objetivo (pie)"
+                        )
+
+                        st.altair_chart(pie_chart, use_container_width=True)
+
+                st.dataframe(df_player, use_container_width=True, height=dyn_h)
 
         with tab3:
             st.subheader("🎯 Dados por Objetivo")
