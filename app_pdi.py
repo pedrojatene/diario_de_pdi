@@ -286,7 +286,7 @@ if auth_status:
 
                 bar = (
                     alt.Chart(daily_counts)
-                    .mark_bar(color="#D30000", opacity=0.95, size=24)
+                    .mark_bar(color="#E60000", opacity=0.95, size=24)
                     .encode(
                         x=alt.X("Data:T", title="Data"),
                         y=alt.Y("Sessões:Q", title=None),
@@ -307,7 +307,8 @@ if auth_status:
 
                 chart = (
                     (bar + avg_line)
-                    .properties(title="Número de Sessões por Dia \u2014 Média: {:.1f}".format(avg_value))
+                    .properties(title="Número de Sessões por Dia \u2014 Média: {:.1f}".format(avg_value),
+                        height=400)
                 )
 
                 st.altair_chart(chart, use_container_width=True)
@@ -359,7 +360,7 @@ if auth_status:
                     f"📄 Registros de {atleta_escolhido} "
                     f"({periodo[0].strftime('%d/%m/%Y')} – {periodo[1].strftime('%d/%m/%Y')})"
                 )
-
+                st.markdown("")
                 # --- charts side‑by‑side: sessões por objetivo ----------------------
                 if not df_player.empty:
                     goal_counts = (
@@ -381,7 +382,7 @@ if auth_status:
                     with colC:
                         bar = (
                             alt.Chart(goal_counts)
-                               .mark_bar(size=40, opacity=0.9, color="#FF4B4B")
+                               .mark_bar(size=40, cornerRadiusTopLeft=5, cornerRadiusTopRight=5, opacity=0.9, color="#FF4B4B")
                                .encode(
                                    x=alt.X("Objetivo:N",
                                            sort="-y",
@@ -389,7 +390,7 @@ if auth_status:
                                            axis=alt.Axis(labelAngle=0, grid=False)),
                                    y=alt.Y("Sessões:Q",
                                            title=None,
-                                           axis=alt.Axis(grid=False)),
+                                           axis=alt.Axis(grid=False, labels=False)),
                                    color=color_encoding,
                                    tooltip=["Objetivo:N", "Sessões:Q"]
                                )
@@ -406,8 +407,8 @@ if auth_status:
                         )
 
                         bar_chart = (bar + labels).properties(
-                            height=350, width="container",
-                            title="Sessões por Objetivo (bar)"
+                            height=400, width="container",
+                            title="Sessões por Objetivo"
                         )
                         st.altair_chart(bar_chart, use_container_width=True)
 
@@ -427,7 +428,7 @@ if auth_status:
 
                         # Actual pie slices
                         pie = (
-                            base.mark_arc(innerRadius=40, outerRadius=120, opacity=0.9)
+                            base.mark_arc(innerRadius=40, outerRadius=130, opacity=0.9)
                                 .encode(
                                     tooltip=[
                                         alt.Tooltip("Objetivo:N", title="Objetivo"),
@@ -437,23 +438,22 @@ if auth_status:
                                 )
                         )
 
-                        # Text labels (white) positioned inside each slice
+                        # --- text labels inside slices ----------------------------------
                         labels = (
-                            base.mark_text(radius=80, size=14, color="white")
-                                .encode(
-                                    text=alt.Text("Percent:Q", format=".0%")
-                                )
+                            base.mark_text(radius=150, size=14, color="000000")      # label layer
+                                .encode(text=alt.Text("Percent:Q", format=".0%"))
                         )
 
                         pie_chart = (pie + labels).properties(
-                            width=300, height=300,
-                            title="Sessões por Objetivo (pie)"
+                            width=300, height=400,
+                            title="Composição"
                         )
-
                         st.altair_chart(pie_chart, use_container_width=True)
 
+                st.markdown("")
+                st.markdown("**Todas as Sessões**")
                 st.dataframe(df_player, use_container_width=True, height=dyn_h)
-
+             
         with tab3:
             st.subheader("🎯 Dados por Objetivo")
-            st.write("Em breve: filtros, tabelas e gráficos personalizados por atleta.")
+            st.write("...")
