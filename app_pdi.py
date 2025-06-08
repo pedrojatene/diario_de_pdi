@@ -7,10 +7,52 @@ import gspread
 from google.oauth2 import service_account
 from google.oauth2.service_account import Credentials
 
+from io import BytesIO
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.utils import ImageReader
+from reportlab.pdfgen import canvas
+
 from sheets_api import get_dropdown_options, append_row_to_sheet
 from datetime import date
 from datetime import datetime
 import altair as alt
+
+from altair_saver import save as altair_save
+from PIL import Image
+import tempfile
+import os
+
+def save_altair_chart_as_png(chart, filename="chart.png"):
+    with tempfile.TemporaryDirectory() as tmpdir:
+        tmpfile = os.path.join(tmpdir, filename)
+        altair_save(chart, tmpfile, fmt="png")
+        img = Image.open(tmpfile)
+        return img
+
+def generate_basic_pdf_report(athlete_name, start_date, end_date):
+    buffer = BytesIO()
+    c = canvas.Canvas(buffer, pagesize=A4)
+
+    # Page dimensions
+    width, height = A4
+
+    # Title
+    c.setFont("Helvetica-Bold", 18)
+    c.drawCentredString(width / 2, height - 80, "Relatório de Atividades Individuais")
+
+    # Athlete Name
+    c.setFont("Helvetica", 14)
+    c.drawString(80, height - 120, f"Atleta: {athlete_name}")
+
+    # Date Range
+    date_fmt = "%d/%m/%Y"
+    c.drawString(80, height - 140, f"Período: {start_date.strftime(date_fmt)} até {end_date.strftime(date_fmt)}")
+
+    # Finalize PDF
+    c.showPage()
+    c.save()
+    buffer.seek(0)
+    return buffer
 
 st.set_page_config(
     page_title="Diário de PDI",
@@ -453,6 +495,18 @@ if auth_status:
                 st.markdown("")
                 st.markdown("**Todas as Sessões**")
                 st.dataframe(df_player, use_container_width=True, height=dyn_h)
+
+                st.markdown("---")
+                #st.subheader("📄 Gerar Relatório")
+
+                if st.button("📄 Gerar Relatório"):
+                    pdf_buffer = generate_basic_pdf_report(atleta_escolhido, periodo[0], periodo[1])
+                    st.download_button(
+                        label="📥 Download",
+                        data=pdf_buffer,
+                        file_name=f"Relatório PDI_{atleta_escolhido.lower().replace(' ', '_')}.pdf",
+                        mime="application/pdf"
+                    )
              
         with tab3:
             st.subheader("🎯 Dados por Objetivo")

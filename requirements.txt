@@ -153,3 +153,4 @@ tzdata==2025.2
 urllib3==2.4.0
     # via requests
 matplotlib>=3.7
+reportlab>=4.0
