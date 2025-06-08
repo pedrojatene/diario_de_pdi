@@ -30,15 +30,35 @@ def save_altair_chart_as_png(chart, filename="chart.png"):
         return img
 
 def generate_basic_pdf_report(athlete_name, start_date, end_date):
+    # Load logo before creating the canvas
+    logo_path = os.path.join(os.path.dirname(__file__), "SPFClogo copy.png")
+    if os.path.exists(logo_path):
+        try:
+            logo = ImageReader(logo_path)
+            c.drawImage(logo, 40, height - 100, width=50, preserveAspectRatio=True, mask='auto')
+        except Exception as e:
+            print(f"[ERRO] Falha ao carregar ou desenhar o logo: {e}")
+    else:
+        print(f"[ERRO] Logo não encontrado no caminho: {logo_path}")
     buffer = BytesIO()
     c = canvas.Canvas(buffer, pagesize=A4)
 
     # Page dimensions
     width, height = A4
 
-    # Title
+    # --- Dimensions ---
+    logo_width = 60
+    logo_height = 60
+    margin_left = 40
+    top_y = height - 60  # top padding from A4
+
+    # --- Draw logo ---
+    logo_y = top_y - logo_height  # bring logo down from top
+    c.drawImage(logo, margin_left, logo_y, width=logo_width, height=logo_height, mask='auto')
+
+    # --- Draw title aligned to the right of the logo ---
     c.setFont("Helvetica-Bold", 18)
-    c.drawCentredString(width / 2, height - 80, "Relatório de Atividades Individuais")
+    c.drawString(margin_left + logo_width + 20, top_y - 20, "Relatório de Atividades Individuais")
 
     # Athlete Name
     c.setFont("Helvetica", 14)
