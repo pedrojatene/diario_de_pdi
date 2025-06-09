@@ -11,6 +11,8 @@ from io import BytesIO
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.utils import ImageReader
 from reportlab.pdfgen import canvas
+from reportlab.lib.colors import HexColor
+
 
 from sheets_api import get_dropdown_options, append_row_to_sheet
 from datetime import date
@@ -29,50 +31,102 @@ def save_altair_chart_as_png(chart, filename="chart.png"):
         img = Image.open(tmpfile)
         return img
 
-def generate_basic_pdf_report(athlete_name, start_date, end_date):
-    # Load logo before creating the canvas
-    logo_path = os.path.join(os.path.dirname(__file__), "SPFClogo copy.png")
-    if os.path.exists(logo_path):
-        try:
-            logo = ImageReader(logo_path)
-            c.drawImage(logo, 40, height - 100, width=50, preserveAspectRatio=True, mask='auto')
-        except Exception as e:
-            print(f"[ERRO] Falha ao carregar ou desenhar o logo: {e}")
-    else:
-        print(f"[ERRO] Logo não encontrado no caminho: {logo_path}")
+# FUNÇÃO PARA GERAR RELATÓRIO BÁSICO POR ATLETA
+def generate_basic_player_report(athlete_name, start_date, end_date):
     buffer = BytesIO()
     c = canvas.Canvas(buffer, pagesize=A4)
 
     # Page dimensions
     width, height = A4
 
-    # --- Dimensions ---
+    # --- Draw logos and title ---
+    left_logo_path = os.path.join(os.path.dirname(__file__), "SPFClogo copy.png")
+    right_logo_path = os.path.join(os.path.dirname(__file__), "CFA Logo copy.png")  # replace with your actual filename
+
     logo_width = 60
+    rightlogo_width = 50
     logo_height = 60
     margin_left = 40
-    top_y = height - 60  # top padding from A4
+    margin_right = 30
+    top_y = height - 40
 
-    # --- Draw logo ---
-    logo_y = top_y - logo_height  # bring logo down from top
-    c.drawImage(logo, margin_left, logo_y, width=logo_width, height=logo_height, mask='auto')
+    if os.path.exists(left_logo_path):
+        left_logo = ImageReader(left_logo_path)
+        c.drawImage(left_logo, margin_left, top_y - logo_height, width=logo_width, height=logo_height, mask='auto')
 
-    # --- Draw title aligned to the right of the logo ---
+    if os.path.exists(right_logo_path):
+        right_logo = ImageReader(right_logo_path)
+        right_x = width - margin_right - logo_width
+        c.drawImage(right_logo, right_x, top_y - logo_height, width=rightlogo_width, height=logo_height, mask='auto')
+
     c.setFont("Helvetica-Bold", 18)
-    c.drawString(margin_left + logo_width + 20, top_y - 20, "Relatório de Atividades Individuais")
+    c.setFillColor(HexColor("#E60000"))  # Red color for the title
+    c.drawCentredString(width / 2, top_y - 20, "Relatório de Atividades Individuais")
 
     # Athlete Name
-    c.setFont("Helvetica", 14)
-    c.drawString(80, height - 120, f"Atleta: {athlete_name}")
+    c.setFillColor(HexColor("#000000"))  # Reset to black for the athlete name
+    c.setFont("Helvetica-Bold", 16)
+    c.drawCentredString(width / 2, height - 80, f"{athlete_name}")
 
     # Date Range
     date_fmt = "%d/%m/%Y"
-    c.drawString(80, height - 140, f"Período: {start_date.strftime(date_fmt)} até {end_date.strftime(date_fmt)}")
+    c.setFont("Helvetica", 14)
+    c.drawCentredString(width / 2, height - 100, f"{start_date.strftime(date_fmt)} até {end_date.strftime(date_fmt)}")
 
     # Finalize PDF
     c.showPage()
     c.save()
     buffer.seek(0)
     return buffer
+
+# FUNÇÃO PARA GERAR RELATÓRIO BÁSICO POR ATLETA
+def generate_basic_summary_report(start_date, end_date):
+    buffer = BytesIO()
+    c = canvas.Canvas(buffer, pagesize=A4)
+
+    # Page dimensions
+    width, height = A4
+
+    # --- Draw logos and title ---
+    left_logo_path = os.path.join(os.path.dirname(__file__), "SPFClogo copy.png")
+    right_logo_path = os.path.join(os.path.dirname(__file__), "CFA Logo copy.png")  # replace with your actual filename
+
+    logo_width = 60
+    rightlogo_width = 50
+    logo_height = 60
+    margin_left = 40
+    margin_right = 30
+    top_y = height - 40
+
+    if os.path.exists(left_logo_path):
+        left_logo = ImageReader(left_logo_path)
+        c.drawImage(left_logo, margin_left, top_y - logo_height, width=logo_width, height=logo_height, mask='auto')
+
+    if os.path.exists(right_logo_path):
+        right_logo = ImageReader(right_logo_path)
+        right_x = width - margin_right - logo_width
+        c.drawImage(right_logo, right_x, top_y - logo_height, width=rightlogo_width, height=logo_height, mask='auto')
+
+    c.setFont("Helvetica-Bold", 18)
+    c.setFillColor(HexColor("#E60000"))  # Red color for the title
+    c.drawCentredString(width / 2, top_y - 20, "Relatório de Atividades Individuais")
+
+    # Section Name
+    c.setFillColor(HexColor("#000000"))  # Reset to black for the athlete name
+    c.setFont("Helvetica-Bold", 16)
+    c.drawCentredString(width / 2, height - 80, "Resumo Global")
+
+    # Date Range
+    date_fmt = "%d/%m/%Y"
+    c.setFont("Helvetica", 14)
+    c.drawCentredString(width / 2, height - 100, f"{start_date.strftime(date_fmt)} até {end_date.strftime(date_fmt)}")
+
+    # Finalize PDF
+    c.showPage()
+    c.save()
+    buffer.seek(0)
+    return buffer
+
 
 st.set_page_config(
     page_title="Diário de PDI",
@@ -378,6 +432,14 @@ if auth_status:
             else:
                 st.info("Nenhum dado encontrado na planilha.")
 
+        if st.button("📄 Gerar Relatório", key="relatorio_summary"):
+            pdf_buffer = generate_basic_summary_report(min_date, max_date)
+            st.download_button(
+                label="📥 Download",
+                data=pdf_buffer,
+                file_name=f"Relatório PDI_{max_date}.pdf",
+                mime="application/pdf"
+                )
 
         with tab2:
             # --- pick athlete & date‑range side by side -----------------
@@ -517,10 +579,8 @@ if auth_status:
                 st.dataframe(df_player, use_container_width=True, height=dyn_h)
 
                 st.markdown("---")
-                #st.subheader("📄 Gerar Relatório")
-
-                if st.button("📄 Gerar Relatório"):
-                    pdf_buffer = generate_basic_pdf_report(atleta_escolhido, periodo[0], periodo[1])
+                if st.button("📄 Gerar Relatório", key="relatorio_player"):
+                    pdf_buffer = generate_basic_player_report(atleta_escolhido, periodo[0], periodo[1])
                     st.download_button(
                         label="📥 Download",
                         data=pdf_buffer,
