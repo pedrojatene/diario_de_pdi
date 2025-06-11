@@ -6,6 +6,7 @@ import pandas as pd
 import gspread
 from google.oauth2 import service_account
 from google.oauth2.service_account import Credentials
+import vl_convert as vlc
 
 from io import BytesIO
 from reportlab.lib.pagesizes import A4
@@ -18,68 +19,24 @@ from sheets_api import get_dropdown_options, append_row_to_sheet
 from datetime import date
 from datetime import datetime
 import altair as alt
+alt.renderers.set_embed_options(renderer="svg", actions=False)
 
 from altair_saver import save as altair_save
 from PIL import Image
 import tempfile
 import os
 
+from altair_saver import save as altair_save
+import altair as alt
+
 def save_altair_chart_as_png(chart, filename="chart.png"):
-    with tempfile.TemporaryDirectory() as tmpdir:
-        tmpfile = os.path.join(tmpdir, filename)
-        altair_save(chart, tmpfile, fmt="png")
-        img = Image.open(tmpfile)
-        return img
+    chart_dict = chart.to_dict()
+    png_data = vlc.vegalite_to_png(chart_dict)
+    with open(filename, "wb") as f:
+        f.write(png_data)
+    return filename
 
-# FUNÇÃO PARA GERAR RELATÓRIO BÁSICO POR ATLETA
-def generate_basic_player_report(athlete_name, start_date, end_date):
-    buffer = BytesIO()
-    c = canvas.Canvas(buffer, pagesize=A4)
-
-    # Page dimensions
-    width, height = A4
-
-    # --- Draw logos and title ---
-    left_logo_path = os.path.join(os.path.dirname(__file__), "SPFClogo copy.png")
-    right_logo_path = os.path.join(os.path.dirname(__file__), "CFA Logo copy.png")  # replace with your actual filename
-
-    logo_width = 60
-    rightlogo_width = 50
-    logo_height = 60
-    margin_left = 40
-    margin_right = 30
-    top_y = height - 40
-
-    if os.path.exists(left_logo_path):
-        left_logo = ImageReader(left_logo_path)
-        c.drawImage(left_logo, margin_left, top_y - logo_height, width=logo_width, height=logo_height, mask='auto')
-
-    if os.path.exists(right_logo_path):
-        right_logo = ImageReader(right_logo_path)
-        right_x = width - margin_right - logo_width
-        c.drawImage(right_logo, right_x, top_y - logo_height, width=rightlogo_width, height=logo_height, mask='auto')
-
-    c.setFont("Helvetica-Bold", 18)
-    c.setFillColor(HexColor("#E60000"))  # Red color for the title
-    c.drawCentredString(width / 2, top_y - 20, "Relatório de Atividades Individuais")
-
-    # Athlete Name
-    c.setFillColor(HexColor("#000000"))  # Reset to black for the athlete name
-    c.setFont("Helvetica-Bold", 16)
-    c.drawCentredString(width / 2, height - 80, f"{athlete_name}")
-
-    # Date Range
-    date_fmt = "%d/%m/%Y"
-    c.setFont("Helvetica", 14)
-    c.drawCentredString(width / 2, height - 100, f"{start_date.strftime(date_fmt)} até {end_date.strftime(date_fmt)}")
-
-    # Finalize PDF
-    c.showPage()
-    c.save()
-    buffer.seek(0)
-    return buffer
-
-# FUNÇÃO PARA GERAR RELATÓRIO BÁSICO POR ATLETA
+# FUNÇÃO PARA GERAR RELATÓRIO GERAL
 def generate_basic_summary_report(start_date, end_date):
     buffer = BytesIO()
     c = canvas.Canvas(buffer, pagesize=A4)
@@ -109,12 +66,12 @@ def generate_basic_summary_report(start_date, end_date):
 
     c.setFont("Helvetica-Bold", 18)
     c.setFillColor(HexColor("#E60000"))  # Red color for the title
-    c.drawCentredString(width / 2, top_y - 20, "Relatório de Atividades Individuais")
+    c.drawCentredString(width / 2, top_y - 20, "Resumo Geral")
 
     # Section Name
     c.setFillColor(HexColor("#000000"))  # Reset to black for the athlete name
     c.setFont("Helvetica-Bold", 16)
-    c.drawCentredString(width / 2, height - 80, "Resumo Global")
+    c.drawCentredString(width / 2, height - 80, "Relatório de Atividades Individuais")
 
     # Date Range
     date_fmt = "%d/%m/%Y"
@@ -432,14 +389,14 @@ if auth_status:
             else:
                 st.info("Nenhum dado encontrado na planilha.")
 
-        if st.button("📄 Gerar Relatório", key="relatorio_summary"):
-            pdf_buffer = generate_basic_summary_report(min_date, max_date)
-            st.download_button(
-                label="📥 Download",
-                data=pdf_buffer,
-                file_name=f"Relatório PDI_{max_date}.pdf",
-                mime="application/pdf"
-                )
+            if st.button("📄 Gerar Relatório", key="relatorio_summary"):
+                pdf_buffer = generate_basic_summary_report(min_date, max_date)
+                st.download_button(
+                    label="📥 Download",
+                    data=pdf_buffer,
+                    file_name=f"Relatório PDI_{max_date}.pdf",
+                    mime="application/pdf"
+                    )
 
         with tab2:
             # --- pick athlete & date‑range side by side -----------------
@@ -481,7 +438,7 @@ if auth_status:
                 dyn_h     = header_px + row_px * len(df_player) + buffer_px
 
                 st.subheader(
-                    f"📄 Registros de {atleta_escolhido} "
+                    f"📄 Sessões de {atleta_escolhido} "
                     f"({periodo[0].strftime('%d/%m/%Y')} – {periodo[1].strftime('%d/%m/%Y')})"
                 )
                 st.markdown("")
@@ -506,15 +463,15 @@ if auth_status:
                     with colC:
                         bar = (
                             alt.Chart(goal_counts)
-                               .mark_bar(size=40, cornerRadiusTopLeft=5, cornerRadiusTopRight=5, opacity=0.9, color="#FF4B4B")
+                               .mark_bar(size=40, cornerRadiusTopLeft=5, cornerRadiusTopRight=5, opacity=0.95, color="#FF4B4B")
                                .encode(
                                    x=alt.X("Objetivo:N",
                                            sort="-y",
                                            title=None,
-                                           axis=alt.Axis(labelAngle=0, grid=False)),
+                                           axis=alt.Axis(labelAngle=0, grid=False, domain=False)),
                                    y=alt.Y("Sessões:Q",
                                            title=None,
-                                           axis=alt.Axis(grid=False, labels=False)),
+                                           axis=alt.Axis(grid=False, labels=False, domain=False)),
                                    color=color_encoding,
                                    tooltip=["Objetivo:N", "Sessões:Q"]
                                )
@@ -533,7 +490,16 @@ if auth_status:
                         bar_chart = (bar + labels).properties(
                             height=400, width="container",
                             title="Sessões por Objetivo"
+                        ).configure_axis(
+                            grid=False,
+                            domain=False,
+                            ticks=False
+                        ).configure_view(
+                            stroke=None
+                        ).configure_title(
+                            fontSize=16
                         )
+
                         st.altair_chart(bar_chart, use_container_width=True)
 
                     # ---- prepare percentages in pandas ---------------------------------
@@ -578,9 +544,127 @@ if auth_status:
                 st.markdown("**Todas as Sessões**")
                 st.dataframe(df_player, use_container_width=True, height=dyn_h)
 
+                # FUNÇÃO PARA GERAR RELATÓRIO BÁSICO POR ATLETA
+                def generate_basic_player_report(athlete_name, start_date, end_date, df_player, bar_chart, pie_chart):
+                    buffer = BytesIO()
+                    c = canvas.Canvas(buffer, pagesize=A4)
+
+                    # Page dimensions
+                    width, height = A4
+
+                    # --- Draw logos and title ---
+                    left_logo_path = os.path.join(os.path.dirname(__file__), "SPFClogo copy.png")
+                    right_logo_path = os.path.join(os.path.dirname(__file__), "CFA Logo copy.png")  # replace with your actual filename
+
+                    logo_width = 60
+                    rightlogo_width = 50
+                    logo_height = 60
+                    margin_left = 40
+                    margin_right = 30
+                    top_y = height - 40
+
+                    if os.path.exists(left_logo_path):
+                        left_logo = ImageReader(left_logo_path)
+                        c.drawImage(left_logo, margin_left, top_y - logo_height, width=logo_width, height=logo_height, mask='auto')
+
+                    if os.path.exists(right_logo_path):
+                        right_logo = ImageReader(right_logo_path)
+                        right_x = width - margin_right - logo_width
+                        c.drawImage(right_logo, right_x, top_y - logo_height, width=rightlogo_width, height=logo_height, mask='auto')
+
+                    # Athlete Name
+                    c.setFont("Helvetica-Bold", 18)
+                    c.setFillColor(HexColor("#E60000"))  # Red color for the title
+                    c.drawCentredString(width / 2, top_y - 20, f"{athlete_name}")
+
+                    c.setFillColor(HexColor("#000000"))  # Reset to black for the athlete name
+                    c.setFont("Helvetica-Bold", 16)
+                    c.drawCentredString(width / 2, height - 80, "Relatório de Atividades Individuais")
+
+                    # Date Range
+                    date_fmt = "%d/%m/%Y"
+                    c.setFont("Helvetica", 14)
+                    c.drawCentredString(width / 2, height - 100, f"{start_date.strftime(date_fmt)} até {end_date.strftime(date_fmt)}")
+
+                    # Space for data insights
+                    y_position = height - 150
+                    line_spacing = 22
+
+                    # Left Column
+                    x_left = 100
+                    # Right Column
+                    x_right = width / 2 + 25
+                    y_start = y_position
+
+                    # Resumo
+                    c.setFont("Helvetica-Bold", 12)
+                    c.drawString(x_left, y_position, "Resumo")
+                    y_position -= line_spacing
+
+                    # Dias de Treino
+                    unique_dates = df_player["Data"].nunique()
+                    c.setFont("Helvetica", 12)
+                    c.drawString(x_left, y_position, "Dias de Treino no Período:")
+                    c.setFont("Helvetica-Bold", 12)
+                    c.drawString(x_left + 150, y_position, f"{unique_dates:02d}")
+
+                    # Total de Sessões
+                    total_sessions = len(df_player)
+                    c.setFont("Helvetica", 12)
+                    c.drawString(x_right, y_position, "Total de Sessões no Período:")
+                    c.setFont("Helvetica-Bold", 12)
+                    c.drawString(x_right + 166, y_position, f"{total_sessions:02d}")
+                    y_position -= line_spacing
+
+                    # Dias de Folga
+                    all_dates = pd.date_range(start=start_date, end=end_date).date
+                    registered_dates = set(df_player["Data"])
+                    missing_dates = [d for d in all_dates if d not in registered_dates]
+                    c.setFont("Helvetica", 12)
+                    c.drawString(x_left, y_position, "Dias de Folga no Período:")
+                    c.setFont("Helvetica-Bold", 12)
+                    c.drawString(x_left + 150, y_position, f"{len(missing_dates):02d}")
+
+                    # Média de sessões
+                    media_sessoes = total_sessions / (unique_dates + len(missing_dates)) if (unique_dates + len(missing_dates)) > 0 else 0
+                    c.setFont("Helvetica", 12)
+                    c.drawString(x_right, y_position, "Média de Sessões por Dia:")
+                    c.setFont("Helvetica-Bold", 12)
+                    c.drawString(x_right + 156, y_position, f"{media_sessoes:.2f}")
+
+                    # --- Convert charts to images using vl_convert ---
+                    bar_chart_dict = bar_chart.to_dict()
+                    bar_png_data = vlc.vegalite_to_png(bar_chart_dict)
+                    bar_img = ImageReader(BytesIO(bar_png_data))
+
+                    pie_chart_dict = pie_chart.to_dict()
+                    pie_png_data = vlc.vegalite_to_png(pie_chart_dict)
+                    pie_img = ImageReader(BytesIO(pie_png_data))
+
+                    # TAMANHO DOS GRÁFICOS
+                    bar_chart_width = 300
+                    bar_chart_height = 300
+                    pie_chart_width = 207
+                    pie_chart_height = 270
+
+                    bar_y = 320
+                    pie_y = bar_y - 300
+
+                    c.drawImage(bar_img, 40, bar_y, width=bar_chart_width, height=bar_chart_height, mask='auto')
+                    c.drawImage(pie_img, 60, pie_y, width=pie_chart_width, height=pie_chart_height, mask='auto')
+
+                    # Finalize PDF
+                    c.showPage()
+                    c.save()
+                    buffer.seek(0)
+                    return buffer
+
                 st.markdown("---")
+                
                 if st.button("📄 Gerar Relatório", key="relatorio_player"):
-                    pdf_buffer = generate_basic_player_report(atleta_escolhido, periodo[0], periodo[1])
+                    pdf_buffer = generate_basic_player_report(
+                        atleta_escolhido, periodo[0], periodo[1],
+                        df_player, bar_chart, pie_chart)
                     st.download_button(
                         label="📥 Download",
                         data=pdf_buffer,
