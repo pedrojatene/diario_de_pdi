@@ -540,6 +540,43 @@ if auth_status:
                         )
                         st.altair_chart(pie_chart, use_container_width=True)
 
+                    # --- Stacked Bar Chart: Distribuição por Objetivo e Sessão ---
+                    st.markdown("")
+                    st.markdown("**Detalhamento das Sessões por Objetivo**")
+
+                    stacked_data = (
+                        df_player.groupby(["Objetivo", "Sessão"])
+                                 .size()
+                                 .reset_index(name="Contagem")
+                    )
+
+                    stacked_bar = (
+                        alt.Chart(stacked_data)
+                           .mark_bar(size=60, cornerRadiusTopLeft=5, cornerRadiusTopRight=5, opacity=0.95)
+                           .encode(
+                               x=alt.X("Objetivo:N", sort="-y", title=None, axis=alt.Axis(grid=False, labelAngle=0)),
+                               y=alt.Y("Contagem:Q", stack="zero", title=None, axis=alt.Axis(grid=False, labels=False, ticks=False, domain=False)),
+                               color=alt.Color("Sessão:N", title=None),
+                               tooltip=["Objetivo:N", "Sessão:N", "Contagem:Q"]
+                           )
+                           .properties(height=400, width="container")
+                    )
+
+                    labels = (
+                        alt.Chart(stacked_data)
+                            .mark_text(size=13, dy=-2, color="black", baseline="bottom")
+                            .encode(
+                                x=alt.X("Objetivo:N", sort="-y"),
+                                y=alt.Y("Contagem:Q", stack="zero"),
+                                detail="Sessão:N",
+                                text=alt.Text("Contagem:Q"),
+                                color=alt.Color("Sessão:N")
+                            )
+                    )
+
+                    stacked_bar_with_labels = (stacked_bar + labels).configure_axis(grid=False)
+                    st.altair_chart(stacked_bar_with_labels, use_container_width=True)
+
                 st.markdown("")
                 st.markdown("**Todas as Sessões**")
                 st.dataframe(df_player, use_container_width=True, height=dyn_h)
